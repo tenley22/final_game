@@ -21,7 +21,7 @@ class SpriteSheet:
         image.blit(self.sheet, (0, 0), rect)
         if colorkey is not None:
             if colorkey is -1:
-                colorkey = image.get_at((0,0))
+                colorkey = image.get_at((0,50))
             image.set_colorkey(colorkey, pygame.RLEACCEL)
         return image
 
@@ -77,20 +77,18 @@ class Layout(pygame.sprite.Sprite):
     def __init__(self, size):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
-        self.tile_sheet = SpriteSheet('assets/rocks.png')
+        self.tile_sheet = SpriteSheet('assets/bg_image.png')
         self.left_end_rock = self.tile_sheet.image_at((0, 0, 64, 64))
-        self.left_rock = self.tile_sheet.image_at((64, 0, 64, 64))
-        self.right_rock = self.tile_sheet.image_at((64, 64, 64, 64))
+        self.left_rock = self.tile_sheet.image_at((65, 0, 64, 64))
+        self.right_rock = self.tile_sheet.image_at((65, 64, 64, 64))
         self.right_end_rock = self.tile_sheet.image_at((0, 64, 64, 64))
         self.left_end_rock = pygame.transform.scale(self.left_end_rock, (size, size))
         self.left_rock = pygame.transform.scale(self.left_rock, (size, size))
         self.right_rock = pygame.transform.scale(self.right_rock, (size, size))
         self.right_end_rock = pygame.transform.scale(self.right_end_rock, (size, size))
-        self.tile_velocity = 0
         self.blocks_group = pygame.sprite.Group()
         self.tile_list = []
 
-    def create_layout(self):
         for i, row in enumerate(LAYOUT):
             for j, col in enumerate(row):
                 x_val = j * self.size
