@@ -154,20 +154,26 @@ class Player(pygame.sprite.Sprite):
 
         # update delta with velocity
         dy += self.velocity_y
-        '''
-        # CAMERA SCROLL
-        if self.image_rect.x <= 10 and self.left and keys[pygame.K_LEFT]:
-            dx = 0
+
+        # CAMERA SCROLL (VERTICAL)
+        if self.image_rect.y <= 10 and self.jumping:
+            dy = 0
             self.tile_velocity = 5
-        elif self.image_rect.x >= WIN_WIDTH - 60 and self.right and keys[pygame.K_RIGHT]:
-            dx = 0
+        elif self.image_rect.y >= WIN_HEIGHT - 60 and self.falling:
+            dy = 0
             self.tile_velocity = -5
         else:
             self.tile_velocity = 0
         for tile in self.tile_set:
-            tile[1][0] += self.tile_velocity
-            # tile[1] gets the rectangle with x,y coordinate and [0] gets just the x coordinate to add velocity to
-        '''
+            tile[1][1] += self.tile_velocity
+            # tile[1] gets the rectangle with x,y coordinate and [1] gets just the y coordinate to add velocity to
+
+        # keeping player inside of screen horizontally
+        if self.image_rect.x <= 0 and self.left and keys[pygame.K_LEFT]:
+            dx = 0
+        elif self.image_rect.x >= WIN_WIDTH and self.right and keys[pygame.K_RIGHT]:
+            dx = 0
+
             # tiles in layout list
         for tile in self.tile_set:
             if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
