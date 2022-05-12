@@ -21,7 +21,7 @@ class SpriteSheet:
         image.blit(self.sheet, (0, 0), rect)
         if colorkey is not None:
             if colorkey is -1:
-                colorkey = image.get_at((0,50))
+                colorkey = image.get_at((0, 0))
             image.set_colorkey(colorkey, pygame.RLEACCEL)
         return image
 
@@ -72,12 +72,150 @@ class SpriteSheet:
         return self.images_at(sprite_rects, colorkey)
 
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self, x, y, tile_size, tile_set, display):
+        pygame.sprite.Sprite.__init__(self)
+        self.tile_size = tile_size
+        self.tile_set = tile_set
+        self.display = display
+        self.run_right_list = []
+        self.run_left_list = []
+        self.stand_left = None
+        self.load_images()
+        self.image = self.run_right_list[1]
+        self.image_rect = self.image.get_rect()
+        self.image_rect.x = x
+        self.image_rect.y = y
+        self.last = pygame.time.get_ticks()
+        self.delay = 100
+        self.current_frame = 0
+        self.right = True
+        self.left = False
+
+        self.velocity_y = 0
+        self.jumping = False
+        self.falling = False
+        self.tile_velocity = 0
+
+    def update(self):
+        # create deltas
+        dx = 0
+        dy = 0
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT]:
+            self.right = True
+            self.left = False
+            dx = 5
+            now = pygame.time.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.run_right_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.run_right_list[self.current_frame]
+                self.current_frame += 1
+        elif keys[pygame.K_LEFT]:
+            self.right = False
+            self.left = True
+            dx = -5
+            now = pygame.time.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.run_left_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.run_left_list[self.current_frame]
+                self.current_frame += 1
+        else:
+            dx = 0
+            self.current_frame = 0
+            if self.right:
+                self.image = self.stand_right
+            elif self.left:
+                self.image = self.stand_left
+        if keys[pygame.K_UP] and not self.jumping and not self.falling:
+            self.jumping = True
+            dy = -30
+        if not keys[pygame.K_UP]:
+            self.jumping = False
+
+        self.velocity_y += 1
+        if self.velocity_y < 0:
+            self.jumping = True
+            self.falling = False
+        else:
+            self.jumping = False
+            self.falling = True
+
+        # terminal velocity
+        if self.velocity_y >= 10:
+            self.velocity_y = 10
+
+        # update delta with velocity
+        dy += self.velocity_y
+        '''
+        # CAMERA SCROLL
+        if self.image_rect.x <= 10 and self.left and keys[pygame.K_LEFT]:
+            dx = 0
+            self.tile_velocity = 5
+        elif self.image_rect.x >= WIN_WIDTH - 60 and self.right and keys[pygame.K_RIGHT]:
+            dx = 0
+            self.tile_velocity = -5
+        else:
+            self.tile_velocity = 0
+        for tile in self.tile_set:
+            tile[1][0] += self.tile_velocity
+            # tile[1] gets the rectangle with x,y coordinate and [0] gets just the x coordinate to add velocity to
+        '''
+            # tiles in layout list
+        for tile in self.tile_set:
+            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
+                                   self.image_rect.height):
+                dx = 0
+            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
+                                   self.image_rect.height):
+                # collision bottom of platform and top of player
+                if dy < 0:
+                    dy = tile[1].bottom - self.image_rect.top
+                    self.velocity_y = 0
+                    self.jumping = False
+                # collision top of platform and bottom of player
+                elif self.falling:
+                    dy = tile[1].top - self.image_rect.bottom
+                    self.velocity_y = 0
+                    self.falling = False
+
+        self.image_rect.x += dx
+        self.image_rect.y += dy
+
+        self.display.blit(self.image, self.image_rect)
+
+    def load_images(self):
+        diver = SpriteSheet("assets/diver.png")
+        right_run_1 = diver.image_at((41, 99, 14, 27), -1)
+        self.run_right_list.append(right_run_1)
+        right_run_2 = diver.image_at((22, 131, 14, 27), -1)
+        self.run_right_list.append(right_run_2)
+        self.stand_right = diver.image_at((41, 3, 14, 27), -1)
+        right_run_3 = diver.image_at((41, 131, 14, 27), -1)
+        self.run_right_list.append(right_run_3)
+
+        left_run_1 = diver.image_at((60, 99, 14, 27), -1)
+        self.run_left_list.append(left_run_1)
+        left_run_2 = diver.image_at((3, 131, 14, 27), -1)
+        self.run_left_list.append(left_run_2)
+        self.stand_left = diver.image_at((60, 3, 14, 27), -1)
+        left_run_3 = diver.image_at((60, 131, 14, 27), -1)
+        self.run_left_list.append(left_run_3)
+
+
 class Layout(pygame.sprite.Sprite):
     # creates layout of the game using sprite sheets
     def __init__(self, size):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
-        self.tile_sheet = SpriteSheet('assets/bg_image.png')
+        self.tile_sheet = SpriteSheet('assets/rocks_map.png')
         self.left_end_rock = self.tile_sheet.image_at((0, 0, 64, 64))
         self.left_rock = self.tile_sheet.image_at((65, 0, 64, 64))
         self.right_rock = self.tile_sheet.image_at((65, 64, 64, 64))
@@ -87,6 +225,7 @@ class Layout(pygame.sprite.Sprite):
         self.right_rock = pygame.transform.scale(self.right_rock, (size, size))
         self.right_end_rock = pygame.transform.scale(self.right_end_rock, (size, size))
         self.blocks_group = pygame.sprite.Group()
+        self.player_group = pygame.sprite.GroupSingle()
         self.tile_list = []
 
         for i, row in enumerate(LAYOUT):
@@ -122,9 +261,17 @@ class Layout(pygame.sprite.Sprite):
                     tile = (self.right_end_rock, image_rect)
                     self.tile_list.append(tile)
 
+                if col == "P":
+                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
+                    player.image_rect.x = x_val
+                    player.image_rect.y = y_val
+                    self.player_group.add(player)
+
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
+
+        self.player_group.update()
 
     def get_layout(self):
         return self.tile_list
