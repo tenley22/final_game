@@ -22,6 +22,8 @@ class SpriteSheet:
         if colorkey is not None:
             if colorkey is -1:
                 colorkey = image.get_at((0, 0))
+            if colorkey is -2:
+                colorkey = image.get_at((2, 63))
             image.set_colorkey(colorkey, pygame.RLEACCEL)
         return image
 
@@ -136,7 +138,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.stand_left
         if keys[pygame.K_UP] and not self.jumping and not self.falling:
             self.jumping = True
-            dy = -30
+            dy = -50
         if not keys[pygame.K_UP]:
             self.jumping = False
 
@@ -216,16 +218,57 @@ class Player(pygame.sprite.Sprite):
         self.run_left_list.append(left_run_3)
 
 
+class Shark(pygame.sprite.Sprite):
+    def __init__(self, x, y, tile_size, tile_set, display):
+        pygame.sprite.Sprite.__init__(self)
+        self.tile_size = tile_size
+        self.tile_set = tile_set
+        self.display = display
+        self.right_list = []
+        self.left_list = []
+        self.stand_left = None
+        self.load_images()
+        self.image = self.right_list[1]
+        self.image_rect = self.image.get_rect()
+        self.image_rect.x = x
+        self.image_rect.y = y
+        self.last = pygame.time.get_ticks()
+        self.delay = 100
+        self.current_frame = 0
+        self.right = True
+        self.left = False
+
+    def load_images(self):
+        shark = SpriteSheet("assets/shark.png")
+        shark_r1 = shark.image_at((41, 99, 14, 27), -1)
+        self.right_list.append(shark_r1)
+        shark_r2 = shark.image_at((41, 99, 14, 27), -1)
+        self.right_list.append(shark_r2)
+        shark_r3 = shark.image_at((41, 99, 14, 27), -1)
+        self.right_list.append(shark_r3)
+        shark_r4 = shark.image_at((41, 99, 14, 27), -1)
+        self.right_list.append(shark_r4)
+
+        shark_l1 = shark.image_at((8, 28, 104, 37), -1)
+        self.left_list.append(shark_l1)
+        shark_l2 = shark.image_at((8, 65, 104, 37), -1)
+        self.left_list.append(shark_l2)
+        shark_l3 = shark.image_at((8, 99, 104, 37), -1)
+        self.left_list.append(shark_l3)
+        shark_l4 = shark.image_at((8, 99, 104, 37), -1)
+        self.left_list.append(shark_l4)
+
+
 class Layout(pygame.sprite.Sprite):
     # creates layout of the game using sprite sheets
     def __init__(self, size):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
-        self.tile_sheet = SpriteSheet('assets/rocks_map.png')
-        self.left_end_rock = self.tile_sheet.image_at((0, 0, 64, 64))
-        self.left_rock = self.tile_sheet.image_at((65, 0, 64, 64))
-        self.right_rock = self.tile_sheet.image_at((65, 64, 64, 64))
-        self.right_end_rock = self.tile_sheet.image_at((0, 64, 64, 64))
+        self.tile_sheet = SpriteSheet('assets/tilemap_2.png')
+        self.left_end_rock = self.tile_sheet.image_at((0, 0, 64, 64), -2)
+        self.left_rock = self.tile_sheet.image_at((65, 0, 64, 64), -2)
+        self.right_rock = self.tile_sheet.image_at((65, 64, 64, 64), -2)
+        self.right_end_rock = self.tile_sheet.image_at((0, 64, 64, 64), -2)
         self.left_end_rock = pygame.transform.scale(self.left_end_rock, (size, size))
         self.left_rock = pygame.transform.scale(self.left_rock, (size, size))
         self.right_rock = pygame.transform.scale(self.right_rock, (size, size))
