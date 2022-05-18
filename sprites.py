@@ -160,10 +160,10 @@ class Player(pygame.sprite.Sprite):
         # CAMERA SCROLL (VERTICAL)
         if self.image_rect.y <= 10 and self.jumping:
             dy = 0
-            self.tile_velocity = 5
+            self.tile_velocity = 3
         elif self.image_rect.y >= WIN_HEIGHT - 60 and self.falling:
             dy = 0
-            self.tile_velocity = -5
+            self.tile_velocity = -3
         else:
             self.tile_velocity = 0
         for tile in self.tile_set:
