@@ -138,7 +138,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.stand_left
         if keys[pygame.K_UP] and not self.jumping and not self.falling:
             self.jumping = True
-            dy = -50
+            dy = -15
         if not keys[pygame.K_UP]:
             self.jumping = False
 
@@ -151,8 +151,8 @@ class Player(pygame.sprite.Sprite):
             self.falling = True
 
         # terminal velocity
-        if self.velocity_y >= 10:
-            self.velocity_y = 10
+        if self.velocity_y >= 3:
+            self.velocity_y = 3
 
         # update delta with velocity
         dy += self.velocity_y
@@ -238,6 +238,39 @@ class Shark(pygame.sprite.Sprite):
         self.right = True
         self.left = False
 
+    def update(self):
+        dx = 0
+        dy = 0
+
+        if self.image_rect.x >= 250:  # determine which side enemy is on & which direction it has to face
+            self.right = False
+            self.left = True
+            dx = -10
+            now = pygame.time.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.left_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.left_list[self.current_frame]
+                self.current_frame += 1
+        elif self.image_rect.x <= 249:
+            self.right = True
+            self.left = False
+            dx = 10
+            now = pygame.time.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.right_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.right_list[self.current_frame]
+                self.current_frame += 1
+
+        self.image_rect.x += dx
+
+        self.display.blit(self.image, self.image_rect)
+
     def load_images(self):
         shark = SpriteSheet("assets/shark.png")
         shark_r1 = shark.image_at((41, 99, 14, 27), -1)
@@ -275,6 +308,7 @@ class Layout(pygame.sprite.Sprite):
         self.right_end_rock = pygame.transform.scale(self.right_end_rock, (size, size))
         self.blocks_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.GroupSingle()
+        self.enemy_group = pygame.sprite.GroupSingle()
         self.tile_list = []
 
         for i, row in enumerate(LAYOUT):
@@ -315,6 +349,12 @@ class Layout(pygame.sprite.Sprite):
                     player.image_rect.x = x_val
                     player.image_rect.y = y_val
                     self.player_group.add(player)
+
+                if col == "e":
+                    enemy = Shark(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
+                    enemy.image_rect.x = x_val
+                    enemy.image_rect.y = y_val
+                    self.enemy_group.add(enemy)
 
     def update(self):
         for tile in self.tile_list:
