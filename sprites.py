@@ -297,6 +297,7 @@ class Layout(pygame.sprite.Sprite):
     def __init__(self, size):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
+        # main rocks tiles
         self.tile_sheet = SpriteSheet('assets/tilemap_2.png')
         self.left_end_rock = self.tile_sheet.image_at((0, 0, 64, 64), -2)
         self.left_rock = self.tile_sheet.image_at((65, 0, 64, 64), -2)
@@ -306,6 +307,17 @@ class Layout(pygame.sprite.Sprite):
         self.left_rock = pygame.transform.scale(self.left_rock, (size, size))
         self.right_rock = pygame.transform.scale(self.right_rock, (size, size))
         self.right_end_rock = pygame.transform.scale(self.right_end_rock, (size, size))
+        # enemy rocks tiles
+        self.enemy_tile_sheet = SpriteSheet('assets/enemy_rocks.png')
+        self.le_enemy_rock = self.enemy_tile_sheet.image_at((0, 0, 64, 64), -2)
+        self.l_enemy_rock = self.enemy_tile_sheet.image_at((65, 0, 64, 64), -2)
+        self.r_enemy_rock = self.enemy_tile_sheet.image_at((65, 64, 64, 64), -2)
+        self.re_enemy_rock = self.enemy_tile_sheet.image_at((0, 64, 64, 64), -2)
+        self.le_enemy_rock = pygame.transform.scale(self.le_enemy_rock, (size, size))
+        self.l_enemy_rock = pygame.transform.scale(self.l_enemy_rock, (size, size))
+        self.r_enemy_rock = pygame.transform.scale(self.r_enemy_rock, (size, size))
+        self.re_enemy_rock = pygame.transform.scale(self.re_enemy_rock, (size, size))
+
         self.blocks_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.GroupSingle()
         self.enemy_group = pygame.sprite.GroupSingle()
@@ -342,6 +354,34 @@ class Layout(pygame.sprite.Sprite):
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.right_end_rock, image_rect)
+                    self.tile_list.append(tile)
+
+                if col == "a":
+                    image_rect = self.le_enemy_rock.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (self.le_enemy_rock, image_rect)
+                    self.tile_list.append(tile)
+
+                if col == "b":
+                    image_rect = self.l_enemy_rock.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (self.l_enemy_rock, image_rect)
+                    self.tile_list.append(tile)
+
+                if col == "c":
+                    image_rect = self.r_enemy_rock.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (self.r_enemy_rock, image_rect)
+                    self.tile_list.append(tile)
+
+                if col == "d":
+                    image_rect = self.re_enemy_rock.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (self.re_enemy_rock, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "P":
