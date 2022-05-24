@@ -32,6 +32,7 @@ while playing:
         if event.type == pygame.KEYDOWN:  # allow for q key to quit the game
             if event.key == pygame.K_q:
                 playing = False
+
     screen.fill(BG)
     # maybe a gradient look as the player moves lower into the level for BG color?
     all_sprites.update()

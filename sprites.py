@@ -355,33 +355,33 @@ class Layout(pygame.sprite.Sprite):
                     image_rect.y = y_val
                     tile = (self.right_end_rock, image_rect)
                     self.tile_list.append(tile)
-
+                # enemy tiles, adding 1 for different collision
                 if col == "a":
                     image_rect = self.le_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.le_enemy_rock, image_rect)
+                    tile = (self.le_enemy_rock, image_rect, 1)
                     self.tile_list.append(tile)
 
                 if col == "b":
                     image_rect = self.l_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.l_enemy_rock, image_rect)
+                    tile = (self.l_enemy_rock, image_rect, 1)
                     self.tile_list.append(tile)
 
                 if col == "c":
                     image_rect = self.r_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.r_enemy_rock, image_rect)
+                    tile = (self.r_enemy_rock, image_rect, 1)
                     self.tile_list.append(tile)
 
                 if col == "d":
                     image_rect = self.re_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.re_enemy_rock, image_rect)
+                    tile = (self.re_enemy_rock, image_rect, 1)
                     self.tile_list.append(tile)
 
                 if col == "P":
