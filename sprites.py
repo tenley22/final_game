@@ -242,19 +242,7 @@ class Shark(pygame.sprite.Sprite):
         dx = 0
         dy = 0
 
-        if self.image_rect.x >= 510:  # determine which side enemy is on & which direction it has to face
-            self.right = False
-            self.left = True
-            dx = -2
-            now = pygame.time.get_ticks()
-            if now - self.last >= self.delay:
-                self.last = now
-                if self.current_frame >= len(self.left_list):
-                    self.current_frame = 0
-                    self.current_frame = (self.current_frame + 1)
-                self.image = self.left_list[self.current_frame]
-                self.current_frame += 1
-        elif self.image_rect.x <= 510:
+        if self.image_rect.x <= 400:
             self.right = True
             self.left = False
             dx = 2
@@ -266,6 +254,18 @@ class Shark(pygame.sprite.Sprite):
                     self.current_frame = (self.current_frame + 1)
                 self.image = self.right_list[self.current_frame]
                 self.current_frame += 1
+            if self.image_rect.x >= 400:
+                self.left = True
+                self.right = False
+                dx = -2
+                now = pygame.time.get_ticks()
+                if now - self.last >= self.delay:
+                    self.last = now
+                    if self.current_frame >= len(self.left_list):
+                        self.current_frame = 0
+                        self.current_frame = (self.current_frame + 1)
+                    self.image = self.left_list[self.current_frame]
+                    self.current_frame += 1
 
         self.image_rect.x += dx
 
