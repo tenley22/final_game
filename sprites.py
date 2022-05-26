@@ -242,10 +242,10 @@ class Shark(pygame.sprite.Sprite):
         dx = 0
         dy = 0
 
-        if self.image_rect.x >= 250:  # determine which side enemy is on & which direction it has to face
+        if self.image_rect.x >= 510:  # determine which side enemy is on & which direction it has to face
             self.right = False
             self.left = True
-            dx = -10
+            dx = -2
             now = pygame.time.get_ticks()
             if now - self.last >= self.delay:
                 self.last = now
@@ -254,10 +254,10 @@ class Shark(pygame.sprite.Sprite):
                     self.current_frame = (self.current_frame + 1)
                 self.image = self.left_list[self.current_frame]
                 self.current_frame += 1
-        elif self.image_rect.x <= 249:
+        elif self.image_rect.x <= 510:
             self.right = True
             self.left = False
-            dx = 10
+            dx = 2
             now = pygame.time.get_ticks()
             if now - self.last >= self.delay:
                 self.last = now
@@ -273,22 +273,22 @@ class Shark(pygame.sprite.Sprite):
 
     def load_images(self):
         shark = SpriteSheet("assets/shark.png")
-        shark_r1 = shark.image_at((41, 99, 14, 27), -1)
+        shark_r1 = shark.image_at((155, 28, 104, 34), -1)
         self.right_list.append(shark_r1)
-        shark_r2 = shark.image_at((41, 99, 14, 27), -1)
+        shark_r2 = shark.image_at((155, 65, 104, 34), -1)
         self.right_list.append(shark_r2)
-        shark_r3 = shark.image_at((41, 99, 14, 27), -1)
+        shark_r3 = shark.image_at((155, 154, 104, 34), -1)
         self.right_list.append(shark_r3)
-        shark_r4 = shark.image_at((41, 99, 14, 27), -1)
+        shark_r4 = shark.image_at((155, 195, 104, 34), -1)
         self.right_list.append(shark_r4)
 
-        shark_l1 = shark.image_at((8, 28, 104, 37), -1)
+        shark_l1 = shark.image_at((8, 28, 104, 32), -1)
         self.left_list.append(shark_l1)
         shark_l2 = shark.image_at((8, 65, 104, 37), -1)
         self.left_list.append(shark_l2)
-        shark_l3 = shark.image_at((8, 99, 104, 37), -1)
+        shark_l3 = shark.image_at((8, 154, 104, 37), -1)
         self.left_list.append(shark_l3)
-        shark_l4 = shark.image_at((8, 99, 104, 37), -1)
+        shark_l4 = shark.image_at((8, 195, 104, 37), -1)
         self.left_list.append(shark_l4)
 
 
@@ -355,7 +355,7 @@ class Layout(pygame.sprite.Sprite):
                     image_rect.y = y_val
                     tile = (self.right_end_rock, image_rect)
                     self.tile_list.append(tile)
-                # enemy tiles, adding 1 for different collision
+                ######## enemy tiles, adding 1 for different collision
                 if col == "a":
                     image_rect = self.le_enemy_rock.get_rect()
                     image_rect.x = x_val
@@ -401,6 +401,7 @@ class Layout(pygame.sprite.Sprite):
             SCREEN.blit(tile[0], tile[1])
 
         self.player_group.update()
+        self.enemy_group.update()
 
     def get_layout(self):
         return self.tile_list
