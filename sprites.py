@@ -219,11 +219,13 @@ class Player(pygame.sprite.Sprite):
 
 
 class Shark(pygame.sprite.Sprite):
-    def __init__(self, x, y, tile_size, tile_set, display):
+    def __init__(self, x, y, tile_size, tile_set, display, speed, direct):
         pygame.sprite.Sprite.__init__(self)
         self.tile_size = tile_size
         self.tile_set = tile_set
         self.display = display
+        self.speed = speed
+        self.direct = direct
         self.right_list = []
         self.left_list = []
         self.stand_left = None
@@ -242,30 +244,34 @@ class Shark(pygame.sprite.Sprite):
         dx = 0
         dy = 0
 
-        if self.image_rect.x <= 400:
+        if self. direct == 0:
             self.right = True
             self.left = False
-            dx = 2
+            dx = self.speed
             now = pygame.time.get_ticks()
+            time = 0
             if now - self.last >= self.delay:
                 self.last = now
+                time += 1
                 if self.current_frame >= len(self.right_list):
                     self.current_frame = 0
                     self.current_frame = (self.current_frame + 1)
                 self.image = self.right_list[self.current_frame]
                 self.current_frame += 1
-            if self.image_rect.x >= 400:
-                self.left = True
-                self.right = False
-                dx = -2
-                now = pygame.time.get_ticks()
-                if now - self.last >= self.delay:
-                    self.last = now
-                    if self.current_frame >= len(self.left_list):
-                        self.current_frame = 0
-                        self.current_frame = (self.current_frame + 1)
-                    self.image = self.left_list[self.current_frame]
-                    self.current_frame += 1
+        elif self. direct == 1:
+            self.right = False
+            self.left = True
+            dx = self.speed * -1
+            now = pygame.time.get_ticks()
+            time = 0
+            if now - self.last >= self.delay:
+                self.last = now
+                time += 1
+                if self.current_frame >= len(self.left_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.left_list[self.current_frame]
+                self.current_frame += 1
 
         self.image_rect.x += dx
 
@@ -355,7 +361,7 @@ class Layout(pygame.sprite.Sprite):
                     image_rect.y = y_val
                     tile = (self.right_end_rock, image_rect)
                     self.tile_list.append(tile)
-                ######## enemy tiles, adding 1 for different collision
+                # enemy tiles, adding 1 for different collision
                 if col == "a":
                     image_rect = self.le_enemy_rock.get_rect()
                     image_rect.x = x_val
@@ -391,7 +397,7 @@ class Layout(pygame.sprite.Sprite):
                     self.player_group.add(player)
 
                 if col == "e":
-                    enemy = Shark(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
+                    enemy = Shark(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN, 2, 1)
                     enemy.image_rect.x = x_val
                     enemy.image_rect.y = y_val
                     self.enemy_group.add(enemy)
