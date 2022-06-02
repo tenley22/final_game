@@ -75,10 +75,11 @@ class SpriteSheet:
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, tile_size, tile_set, display):
+    def __init__(self, x, y, tile_size, tile_set, enemy_tile_set, display):
         pygame.sprite.Sprite.__init__(self)
         self.tile_size = tile_size
         self.tile_set = tile_set
+        self.enemy_tile_set = enemy_tile_set
         self.display = display
         self.run_right_list = []
         self.run_left_list = []
@@ -193,6 +194,25 @@ class Player(pygame.sprite.Sprite):
                     dy = tile[1].top - self.image_rect.bottom
                     self.velocity_y = 0
                     self.falling = False
+
+        # slow velocity/send backward on green tiles
+        for tile in self.enemy_tile_set:
+            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
+                                   self.image_rect.height):
+                dx = 0
+            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
+                                   self.image_rect.height):
+                # collision bottom of platform and top of player
+                if dy < 0:
+                    dy = tile[1].bottom - self.image_rect.top
+                    self.velocity_y = 0
+                    self.jumping = False
+                # collision top of platform and bottom of player
+                elif self.falling:
+                    dy = tile[1].top - self.image_rect.bottom
+                    self.velocity_y = 0
+                    self.falling = False
+                    dx -= 2
 
         self.image_rect.x += dx
         self.image_rect.y += dy
@@ -328,6 +348,8 @@ class Layout(pygame.sprite.Sprite):
         self.player_group = pygame.sprite.GroupSingle()
         self.enemy_group = pygame.sprite.GroupSingle()
         self.tile_list = []
+        self.enemy_tile_list = []
+
 
         for i, row in enumerate(LAYOUT):
             for j, col in enumerate(row):
@@ -367,37 +389,37 @@ class Layout(pygame.sprite.Sprite):
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.le_enemy_rock, image_rect, 1)
-                    self.tile_list.append(tile)
+                    self.enemy_tile_list.append(tile)
 
                 if col == "b":
                     image_rect = self.l_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.l_enemy_rock, image_rect, 1)
-                    self.tile_list.append(tile)
+                    self.enemy_tile_list.append(tile)
 
                 if col == "c":
                     image_rect = self.r_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.r_enemy_rock, image_rect, 1)
-                    self.tile_list.append(tile)
+                    self.enemy_tile_list.append(tile)
 
                 if col == "d":
                     image_rect = self.re_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.re_enemy_rock, image_rect, 1)
-                    self.tile_list.append(tile)
+                    self.enemy_tile_list.append(tile)
 
                 if col == "P":
-                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
+                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, self.enemy_tile_list, SCREEN)
                     player.image_rect.x = x_val
                     player.image_rect.y = y_val
                     self.player_group.add(player)
 
                 if col == "e":
-                    enemy = Shark(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN, 2, 1)
+                    enemy = Shark(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN, 2, 0)
                     enemy.image_rect.x = x_val
                     enemy.image_rect.y = y_val
                     self.enemy_group.add(enemy)
@@ -405,13 +427,15 @@ class Layout(pygame.sprite.Sprite):
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
+        for tile in self.enemy_tile_list:
+            SCREEN.blit(tile[0], tile[1])
 
         self.player_group.update()
         self.enemy_group.update()
 
     def get_layout(self):
         return self.tile_list
+        return self.enemy_tile_list
 
     def get_groups(self):
         return self.blocks_group
-
