@@ -169,6 +169,8 @@ class Player(pygame.sprite.Sprite):
             self.tile_velocity = 0
         for tile in self.tile_set:
             tile[1][1] += self.tile_velocity
+        for tile in self.enemy_tile_set:
+            tile[1][1] += self.tile_velocity
             # tile[1] gets the rectangle with x,y coordinate and [1] gets just the y coordinate to add velocity to
 
         # keeping player inside of screen horizontally
@@ -212,7 +214,10 @@ class Player(pygame.sprite.Sprite):
                     dy = tile[1].top - self.image_rect.bottom
                     self.velocity_y = 0
                     self.falling = False
-                    dx -= 2
+                    if self.right:
+                        dx -= 2
+                    elif self.left:
+                        dx += 2
 
         self.image_rect.x += dx
         self.image_rect.y += dy
@@ -350,7 +355,6 @@ class Layout(pygame.sprite.Sprite):
         self.tile_list = []
         self.enemy_tile_list = []
 
-
         for i, row in enumerate(LAYOUT):
             for j, col in enumerate(row):
                 x_val = j * self.size
@@ -360,28 +364,28 @@ class Layout(pygame.sprite.Sprite):
                     image_rect = self.left_end_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.left_end_rock, image_rect)
+                    tile = (self.left_end_rock, image_rect, 0)
                     self.tile_list.append(tile)
 
                 if col == "2":
                     image_rect = self.left_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.left_rock, image_rect)
+                    tile = (self.left_rock, image_rect, 0)
                     self.tile_list.append(tile)
 
                 if col == "3":
                     image_rect = self.right_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.right_rock, image_rect)
+                    tile = (self.right_rock, image_rect, 0)
                     self.tile_list.append(tile)
 
                 if col == "4":
                     image_rect = self.right_end_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.right_end_rock, image_rect)
+                    tile = (self.right_end_rock, image_rect, 0)
                     self.tile_list.append(tile)
                 # enemy tiles, adding 1 for different collision
                 if col == "a":
@@ -413,7 +417,8 @@ class Layout(pygame.sprite.Sprite):
                     self.enemy_tile_list.append(tile)
 
                 if col == "P":
-                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, self.enemy_tile_list, SCREEN)
+                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, self.enemy_tile_list,
+                                    SCREEN)
                     player.image_rect.x = x_val
                     player.image_rect.y = y_val
                     self.player_group.add(player)
@@ -439,3 +444,5 @@ class Layout(pygame.sprite.Sprite):
 
     def get_groups(self):
         return self.blocks_group
+        return self.enemy_group
+
