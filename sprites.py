@@ -176,7 +176,7 @@ class Player(pygame.sprite.Sprite):
         # keeping player inside of screen horizontally
         if self.image_rect.x <= 0 and self.left and keys[pygame.K_LEFT]:
             dx = 0
-        elif self.image_rect.x >= WIN_WIDTH and self.right and keys[pygame.K_RIGHT]:
+        elif self.image_rect.x >= WIN_WIDTH - 1 and self.right and keys[pygame.K_RIGHT]:
             dx = 0
 
             # tiles in layout list
@@ -364,56 +364,56 @@ class Layout(pygame.sprite.Sprite):
                     image_rect = self.left_end_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.left_end_rock, image_rect, 0)
+                    tile = (self.left_end_rock, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "2":
                     image_rect = self.left_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.left_rock, image_rect, 0)
+                    tile = (self.left_rock, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "3":
                     image_rect = self.right_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.right_rock, image_rect, 0)
+                    tile = (self.right_rock, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "4":
                     image_rect = self.right_end_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.right_end_rock, image_rect, 0)
+                    tile = (self.right_end_rock, image_rect)
                     self.tile_list.append(tile)
                 # enemy tiles, adding 1 for different collision
                 if col == "a":
                     image_rect = self.le_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.le_enemy_rock, image_rect, 1)
+                    tile = (self.le_enemy_rock, image_rect)
                     self.enemy_tile_list.append(tile)
 
                 if col == "b":
                     image_rect = self.l_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.l_enemy_rock, image_rect, 1)
+                    tile = (self.l_enemy_rock, image_rect)
                     self.enemy_tile_list.append(tile)
 
                 if col == "c":
                     image_rect = self.r_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.r_enemy_rock, image_rect, 1)
+                    tile = (self.r_enemy_rock, image_rect)
                     self.enemy_tile_list.append(tile)
 
                 if col == "d":
                     image_rect = self.re_enemy_rock.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.re_enemy_rock, image_rect, 1)
+                    tile = (self.re_enemy_rock, image_rect)
                     self.enemy_tile_list.append(tile)
 
                 if col == "P":
