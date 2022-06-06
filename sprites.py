@@ -348,6 +348,10 @@ class Layout(pygame.sprite.Sprite):
         self.l_enemy_rock = pygame.transform.scale(self.l_enemy_rock, (size, size))
         self.r_enemy_rock = pygame.transform.scale(self.r_enemy_rock, (size, size))
         self.re_enemy_rock = pygame.transform.scale(self.re_enemy_rock, (size, size))
+        # door tile
+        self.door_sheet = SpriteSheet('assets/door_image.png')
+        self.door = self.door_sheet.image_at((0, 0, 128, 128))
+        self.door = pygame.transform.scale(self.door, (size, size))
 
         self.blocks_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.GroupSingle()
@@ -387,7 +391,16 @@ class Layout(pygame.sprite.Sprite):
                     image_rect.y = y_val
                     tile = (self.right_end_rock, image_rect)
                     self.tile_list.append(tile)
-                # enemy tiles, adding 1 for different collision
+
+                # door/exit tile, adding 1 for different collision to end game
+                if col == "D":
+                    image_rect = self.door.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (self.door, image_rect, 1)
+                    self.tile_list.append(tile)
+
+                # enemy tiles
                 if col == "a":
                     image_rect = self.le_enemy_rock.get_rect()
                     image_rect.x = x_val
