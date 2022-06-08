@@ -7,9 +7,11 @@ from settings import *
 ###############################################################################
 
 pygame.init()
-game_layout = sprites.Layout(TILE_SIZE)
-layout_list = game_layout.get_layout()
 player_group = pygame.sprite.Group()
+layout_group = pygame.sprite.Group()
+layout = sprites.Layout(TILE_SIZE)
+layout_list = layout.get_layout()
+layout_group.add(layout)
 
 
 def start_screen():
@@ -24,9 +26,9 @@ def start_screen():
     directions = 'avoid the green algae and reach the exit to win'
     font_1 = pygame.font.SysFont('Arial', 30, True, False)
     font = pygame.font.SysFont('Arial', 15, True, False)
-    text1 = font_1.render(start_text1, True, WHITE)
-    text2 = font_1.render(start_text2, True, WHITE)
-    direct = font.render(directions, True, BLACK)
+    text1 = font_1.render(start_text1, True, LIME)
+    text2 = font_1.render(start_text2, True, LIME)
+    direct = font.render(directions, True, RED)
 
     playing = True
     while playing:
@@ -54,11 +56,6 @@ def game():
 
     # sprite groups
     all_sprites = pygame.sprite.Group()
-    layout_group = pygame.sprite.Group()
-
-    layout = sprites.Layout(TILE_SIZE)
-    layout_list = layout.get_layout()
-    layout_group.add(layout)
 
     playing = True
 
@@ -86,10 +83,10 @@ def game_over():
     clock = pygame.time.Clock()
 
     text1 = 'press space to play again'
-    text2 = 'or press enter to quit'
+    text2 = 'or press Q to quit'
     font_1 = pygame.font.SysFont('Arial', 30, True, False)
-    text1 = font_1.render(text1, True, WHITE)
-    text2 = font_1.render(text2, True, WHITE)
+    text1 = font_1.render(text1, True, LIME)
+    text2 = font_1.render(text2, True, RED)
 
     playing = True
     while playing:
@@ -99,7 +96,7 @@ def game_over():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     playing = False
-                elif event.key == pygame.K_RETURN:
+                elif event.key == pygame.K_q:
                     quit()
         screen.fill(BG)
 

@@ -86,9 +86,9 @@ class Player(pygame.sprite.Sprite):
         self.stand_left = None
         self.load_images()
         self.image = self.run_right_list[1]
-        self.image_rect = self.image.get_rect()
-        self.image_rect.x = x
-        self.image_rect.y = y
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.last = pygame.time.get_ticks()
         self.delay = 100
         self.current_frame = 0
@@ -159,10 +159,10 @@ class Player(pygame.sprite.Sprite):
         dy += self.velocity_y
 
         # CAMERA SCROLL (VERTICAL)
-        if self.image_rect.y <= 10 and self.jumping:
+        if self.rect.y <= 10 and self.jumping:
             dy = 0
             self.tile_velocity = 3
-        elif self.image_rect.y >= WIN_HEIGHT - 60 and self.falling:
+        elif self.rect.y >= WIN_HEIGHT - 60 and self.falling:
             dy = 0
             self.tile_velocity = -3
         else:
@@ -174,44 +174,44 @@ class Player(pygame.sprite.Sprite):
             # tile[1] gets the rectangle with x,y coordinate and [1] gets just the y coordinate to add velocity to
 
         # keeping player inside of screen horizontally
-        if self.image_rect.x <= 0 and self.left and keys[pygame.K_LEFT]:
+        if self.rect.x <= 0 and self.left and keys[pygame.K_LEFT]:
             dx = 0
-        elif self.image_rect.x >= WIN_WIDTH - 1 and self.right and keys[pygame.K_RIGHT]:
+        elif self.rect.x >= WIN_WIDTH - 1 and self.right and keys[pygame.K_RIGHT]:
             dx = 0
 
             # tiles in layout list
         for tile in self.tile_set:
-            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
-                                   self.image_rect.height):
+            if tile[1].colliderect(self.rect.x+dx, self.rect.y, self.rect.width,
+                                   self.rect.height):
                 dx = 0
-            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
-                                   self.image_rect.height):
+            if tile[1].colliderect(self.rect.x, self.rect.y+dy, self.rect.width,
+                                   self.rect.height):
                 # collision bottom of platform and top of player
                 if dy < 0:
-                    dy = tile[1].bottom - self.image_rect.top
+                    dy = tile[1].bottom - self.rect.top
                     self.velocity_y = 0
                     self.jumping = False
                 # collision top of platform and bottom of player
                 elif self.falling:
-                    dy = tile[1].top - self.image_rect.bottom
+                    dy = tile[1].top - self.rect.bottom
                     self.velocity_y = 0
                     self.falling = False
 
         # slow velocity/send backward on green tiles
         for tile in self.enemy_tile_set:
-            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
-                                   self.image_rect.height):
+            if tile[1].colliderect(self.rect.x+dx, self.rect.y, self.rect.width,
+                                   self.rect.height):
                 dx = 0
-            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
-                                   self.image_rect.height):
+            if tile[1].colliderect(self.rect.x, self.rect.y+dy, self.rect.width,
+                                   self.rect.height):
                 # collision bottom of platform and top of player
                 if dy < 0:
-                    dy = tile[1].bottom - self.image_rect.top
+                    dy = tile[1].bottom - self.rect.top
                     self.velocity_y = 0
                     self.jumping = False
                 # collision top of platform and bottom of player
                 elif self.falling:
-                    dy = tile[1].top - self.image_rect.bottom
+                    dy = tile[1].top - self.rect.bottom
                     self.velocity_y = 0
                     self.falling = False
                     if self.right:
@@ -219,10 +219,10 @@ class Player(pygame.sprite.Sprite):
                     elif self.left:
                         dx += 2
 
-        self.image_rect.x += dx
-        self.image_rect.y += dy
+        self.rect.x += dx
+        self.rect.y += dy
 
-        self.display.blit(self.image, self.image_rect)
+        self.display.blit(self.image, self.rect)
 
     def load_images(self):
         diver = SpriteSheet("assets/diver.png")
@@ -323,6 +323,15 @@ class Shark(pygame.sprite.Sprite):
         self.left_list.append(shark_l4)
 
 
+class Door(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((TILE_SIZE + 10, TILE_SIZE))
+        self.rect = self.image.get_rect()
+        self.rect.x = 474
+        self.rect.y = y
+
+
 class Layout(pygame.sprite.Sprite):
     # creates layout of the game using sprite sheets
     def __init__(self, size):
@@ -353,9 +362,13 @@ class Layout(pygame.sprite.Sprite):
         self.door = self.door_sheet.image_at((0, 0, 128, 128))
         self.door = pygame.transform.scale(self.door, (size, size))
 
+        self.player = None
+        self.exit = None
+
         self.blocks_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.GroupSingle()
         self.enemy_group = pygame.sprite.GroupSingle()
+        self.exit_group = pygame.sprite.GroupSingle()
         self.tile_list = []
         self.enemy_tile_list = []
 
@@ -394,11 +407,13 @@ class Layout(pygame.sprite.Sprite):
 
                 # door/exit tile, adding 1 for different collision to end game
                 if col == "D":
+                    self.exit = Door(x_val, y_val)
                     image_rect = self.door.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.door, image_rect, 1)
                     self.tile_list.append(tile)
+                    self.exit_group.add(self.exit)
 
                 # enemy tiles
                 if col == "a":
@@ -430,11 +445,11 @@ class Layout(pygame.sprite.Sprite):
                     self.enemy_tile_list.append(tile)
 
                 if col == "P":
-                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, self.enemy_tile_list,
+                    self.player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, self.enemy_tile_list,
                                     SCREEN)
-                    player.image_rect.x = x_val
-                    player.image_rect.y = y_val
-                    self.player_group.add(player)
+                    self.player.rect.x = x_val
+                    self.player.rect.y = y_val
+                    self.player_group.add(self.player)
 
                 if col == "e":
                     enemy = Shark(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN, 2, 0)
@@ -447,6 +462,10 @@ class Layout(pygame.sprite.Sprite):
             SCREEN.blit(tile[0], tile[1])
         for tile in self.enemy_tile_list:
             SCREEN.blit(tile[0], tile[1])
+
+        if self.player.rect.right == self.exit.rect.left:
+            quit()
+        #pygame.sprite.groupcollide(self.player_group, self.exit_group, True, True)
 
         self.player_group.update()
         self.enemy_group.update()
